@@ -1,12 +1,13 @@
 'use strict';
 
-const Hapi = require('hapi');
-const Lab = require('lab');
+const Hapi = require('@hapi/hapi');
+const Lab = require('@hapi/lab');
 const lab = exports.lab = Lab.script();
 const describe = lab.describe;
 const it = lab.it;
 const beforeEach = lab.beforeEach;
-const expect = require('code').expect;
+const expect = require('@hapi/code').expect;
+
 const delay = ms => new Promise(_ => setTimeout(_, ms));
 describe('Hapi Mongo Connection', () => {
 
@@ -118,6 +119,7 @@ describe('Hapi Mongo Connection', () => {
 
                     const plugin = request.server.plugins['hapi-multi-mongo'];
                     expect(plugin.mongo).to.exist();
+                    expect(plugin.mongo).to.be.an.object();
                     return Promise.resolve(null);
                 }
             });
@@ -148,7 +150,12 @@ describe('Hapi Mongo Connection', () => {
                 handler: (request) => {
 
                     const plugin = request.server.plugins['hapi-multi-mongo'];
+                    expect(plugin.mongo).to.exist();
+                    expect(plugin.mongo).to.be.an.object();
+                    expect(plugins.mongo).to.have('myMongo');
+
                     expect(plugin.myMongo).to.exist();
+                    expect(plugin.myMongo.constructor.name).to.equal('Db');
                     return Promise.resolve(null);
                 }
             });
@@ -303,9 +310,10 @@ describe('Hapi Mongo Connection', () => {
                 handler: (request) => {
 
                     const plugin = server.plugins['hapi-multi-mongo'];
-                    expect(plugin.mongo.myMongo).to.exist();
-                    const db = plugin.mongo.myMongo.db('test');
+                    expect(plugin.mongo.test).to.exist();
+                    const db = plugin.mongo.test;
                     expect(db).to.exist();
+                    expect(db.constructor.name).to.equal('Db');
                     return Promise.resolve(null);
                 }
             });
@@ -341,7 +349,7 @@ describe('Hapi Mongo Connection', () => {
                 handler: async (request) => {
 
                     const plugin = server.plugins['hapi-multi-mongo'];
-                    const db = plugin.mongo.myMongo.db('test');
+                    const db = plugin.mongo['test'];
                     const collection = db.collection('system.indexes');
 
                     try {
@@ -363,7 +371,7 @@ describe('Hapi Mongo Connection', () => {
         }
     });
 
-    it('should be able to have complex multiple connections', async () => {
+    it('should be able to have complex multiple connme:ections', async () => {
 
         try {
             await server.register({
